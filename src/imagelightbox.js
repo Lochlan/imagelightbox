@@ -76,9 +76,8 @@
                     if (options.quitOnEnd === true) {
                         quitLightbox();
                         return false;
-                    } else {
-                        targetIndex = targets.length - 1;
                     }
+                    targetIndex = targets.length - 1;
                 }
                 target = targets.eq(targetIndex);
             },
@@ -93,9 +92,8 @@
                     if (options.quitOnEnd === true) {
                         quitLightbox();
                         return false;
-                    } else {
-                        targetIndex = 0;
                     }
+                    targetIndex = 0;
                 }
                 target = targets.eq(targetIndex);
             },
