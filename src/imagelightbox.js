@@ -53,6 +53,9 @@
 
 
     $.fn.imageLightbox = function (opts) {
+
+        // private data members
+
         var options = $.extend({
             selector: 'id="imagelightbox"',
             allowedTypes: 'png|jpg|jpeg|gif',
@@ -103,6 +106,9 @@
             swipeDiff: 0,
             currentlyLoadingAnImage: false,
         };
+
+
+        // private methods
 
         var isTargetValid = function (element) {
             var allowedFileExtentionsRegex = new RegExp('.(' + options.allowedTypes + ')$', 'i');
@@ -313,7 +319,58 @@
         };
 
 
+        // public methods
+
+        this.startImageLightbox = function (e) {
+            if (!isTargetValid(this)) {
+                return true;
+            }
+            if (e !== undefined) {
+                e.preventDefault();
+            }
+            if (ILBState.currentlyLoadingAnImage) {
+                return false;
+            }
+
+            if (typeof options.onStart === 'function') {
+                options.onStart();
+            }
+            ILBState.target = $(this);
+            loadImage();
+        };
+
+        this.switchImageLightbox = function (index) {
+            var tmpTarget = ILBState.targetsArray.eq(index);
+            if (tmpTarget.length) {
+                var currentIndex = ILBState.targetsArray.index(ILBState.target);
+                ILBState.target = tmpTarget;
+                loadImage(index < currentIndex ? 'left': 'right');
+            }
+            return this;
+        };
+
+        this.loadPreviousImage = function () {
+            loadPreviousImage();
+        };
+
+        this.loadNextImage = function () {
+            loadNextImage();
+        };
+
+        this.quitImageLightbox = function () {
+            quitLightbox();
+            return this;
+        };
+
+
+        // events
+
+        $(document).off('click', this.selector);
+        $(document).on('click', this.selector, this.startImageLightbox);
         $(window).on('resize', setImage);
+
+
+        // "constructor"
 
         if (options.quitOnDocClick) {
             $(document).on(CONST_HASTOUCH ? 'touchend': 'click', function (e) {
@@ -340,56 +397,12 @@
             });
         }
 
-        this.startImageLightbox = function (e) {
-            if (!isTargetValid(this)) {
-                return true;
-            }
-            if (e !== undefined) {
-                e.preventDefault();
-            }
-            if (ILBState.currentlyLoadingAnImage) {
-                return false;
-            }
-
-            if (typeof options.onStart === 'function') {
-                options.onStart();
-            }
-            ILBState.target = $(this);
-            loadImage();
-        };
-
-        $(document).off('click', this.selector);
-        $(document).on('click', this.selector, this.startImageLightbox);
-
         this.each(function () {
             if (!isTargetValid(this)) {
                 return true;
             }
             ILBState.targetsArray = ILBState.targetsArray.add($(this));
         });
-
-        this.switchImageLightbox = function (index) {
-            var tmpTarget = ILBState.targetsArray.eq(index);
-            if (tmpTarget.length) {
-                var currentIndex = ILBState.targetsArray.index(ILBState.target);
-                ILBState.target = tmpTarget;
-                loadImage(index < currentIndex ? 'left': 'right');
-            }
-            return this;
-        };
-
-        this.loadPreviousImage = function () {
-            loadPreviousImage();
-        };
-
-        this.loadNextImage = function () {
-            loadNextImage();
-        };
-
-        this.quitImageLightbox = function () {
-            quitLightbox();
-            return this;
-        };
 
         return this;
     };
