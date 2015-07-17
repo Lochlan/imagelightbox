@@ -1,11 +1,11 @@
-var gulp            = require('gulp'),
-    csslint         = require('gulp-csslint'),
-    jshint          = require('gulp-jshint'),
-    rename          = require('gulp-rename'),
-    uglify          = require('gulp-uglify'),
-    autoprefixer    = require('gulp-autoprefixer'),
-    minifyCSS       = require('gulp-minify-css'),
-    stylish         = require('jshint-stylish');
+var gulp = require('gulp'),
+    csslint = require('gulp-csslint'),
+    jshint = require('gulp-jshint'),
+    rename = require('gulp-rename'),
+    uglify = require('gulp-uglify'),
+    autoprefixer = require('gulp-autoprefixer'),
+    minifyCSS = require('gulp-minify-css'),
+    stylish = require('jshint-stylish');
 
 gulp.task('csslint', function () {
     return gulp.src('src/imagelightbox.css')
@@ -17,7 +17,7 @@ gulp.task('minify:css', function () {
     return gulp.src('src/imagelightbox.css')
         .pipe(autoprefixer({
             browsers: ['last 2 versions', 'ie >= 7', 'Firefox ESR', 'Android >= 2.3'],
-            cascade: false
+            cascade: false,
         }))
         .pipe(minifyCSS())
         .pipe(rename('imagelightbox.min.css'))
