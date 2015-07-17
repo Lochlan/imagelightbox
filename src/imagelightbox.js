@@ -53,7 +53,7 @@
     $.fn.imageLightbox = function (opts) {
         var options = $.extend({
             selector: 'id="imagelightbox"',
-            allowedTypes: 'png|jpg|jpeg||gif', // add support for generated images without an extension
+            allowedTypes: 'png|jpg|jpeg|gif',
             animationSpeed: 250,
             preloadNext: true,
             enableKeyboard: true,
