@@ -50,6 +50,8 @@
         return false;
     };
 
+
+
     $.fn.imageLightbox = function (opts) {
         var options = $.extend({
             selector: 'id="imagelightbox"',
@@ -67,10 +69,6 @@
             onLoadEnd: false,
 
             previousTarget: function () {
-                return this.previousTargetDefault();
-            },
-
-            previousTargetDefault: function () {
                 var targetIndex = GlobalTargetsArray.index(GlobalTarget) - 1;
                 if (targetIndex < 0) {
                     if (options.quitOnEnd === true) {
@@ -83,10 +81,6 @@
             },
 
             nextTarget: function () {
-                return this.nextTargetDefault();
-            },
-
-            nextTargetDefault: function () {
                 var targetIndex = GlobalTargetsArray.index(GlobalTarget) + 1;
                 if (targetIndex >= GlobalTargetsArray.length) {
                     if (options.quitOnEnd === true) {
