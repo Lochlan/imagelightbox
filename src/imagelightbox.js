@@ -70,37 +70,39 @@
             onEnd: undefined, // fired when lightbox closes
 
             previousTarget: function () {
-                var targetIndex = GlobalTargetsArray.index(GlobalTarget) - 1;
+                var targetIndex = ILBState.targetsArray.index(ILBState.target) - 1;
                 if (targetIndex < 0) {
                     if (options.quitOnEnd) {
                         quitLightbox();
                         return false;
                     }
-                    targetIndex = GlobalTargetsArray.length - 1;
+                    targetIndex = ILBState.targetsArray.length - 1;
                 }
-                GlobalTarget = GlobalTargetsArray.eq(targetIndex);
+                ILBState.target = ILBState.targetsArray.eq(targetIndex);
             },
 
             nextTarget: function () {
-                var targetIndex = GlobalTargetsArray.index(GlobalTarget) + 1;
-                if (targetIndex >= GlobalTargetsArray.length) {
+                var targetIndex = ILBState.targetsArray.index(ILBState.target) + 1;
+                if (targetIndex >= ILBState.targetsArray.length) {
                     if (options.quitOnEnd) {
                         quitLightbox();
                         return false;
                     }
                     targetIndex = 0;
                 }
-                GlobalTarget = GlobalTargetsArray.eq(targetIndex);
+                ILBState.target = ILBState.targetsArray.eq(targetIndex);
             },
         }, opts);
 
-        var GlobalTargetsArray = $([]);
-        var GlobalTarget = $();
-        var GlobalImg = $();
-        var GlobalImageWidth = 0;
-        var GlobalImageHeight = 0;
-        var GlobalSwipeDiff = 0;
-        var GlobalInProgress = false;
+        var ILBState = {
+            targetsArray: $([]),
+            target: $(),
+            img: $(),
+            imageWidth: 0,
+            imageHeight: 0,
+            swipeDiff: 0,
+            currentlyLoadingAnImage: false,
+        };
 
         var isTargetValid = function (element) {
             var allowedFileExtentionsRegex = new RegExp('.(' + options.allowedTypes + ')$', 'i');
@@ -111,7 +113,7 @@
         };
 
         var setImage = function () {
-            if (!GlobalImg.length) {
+            if (!ILBState.img.length) {
                 return true;
             }
 
@@ -119,90 +121,90 @@
             var screenHeight = $(window).height() * 0.9;
             var tmpImage = new Image();
 
-            tmpImage.src = GlobalImg.attr('src');
+            tmpImage.src = ILBState.img.attr('src');
             tmpImage.onload = function () {
-                GlobalImageWidth = tmpImage.width;
-                GlobalImageHeight = tmpImage.height;
+                ILBState.imageWidth = tmpImage.width;
+                ILBState.imageHeight = tmpImage.height;
 
-                if (GlobalImageWidth > screenWidth || GlobalImageHeight > screenHeight) {
-                    var ratio = GlobalImageWidth / GlobalImageHeight > screenWidth / screenHeight ? GlobalImageWidth / screenWidth: GlobalImageHeight / screenHeight;
-                    GlobalImageWidth /= ratio;
-                    GlobalImageHeight /= ratio;
+                if (ILBState.imageWidth > screenWidth || ILBState.imageHeight > screenHeight) {
+                    var ratio = ILBState.imageWidth / ILBState.imageHeight > screenWidth / screenHeight ? ILBState.imageWidth / screenWidth: ILBState.imageHeight / screenHeight;
+                    ILBState.imageWidth /= ratio;
+                    ILBState.imageHeight /= ratio;
                 }
 
-                GlobalImg.css({
-                    'width': GlobalImageWidth + 'px',
-                    'height': GlobalImageHeight + 'px',
-                    'top': ($(window).height() - GlobalImageHeight) / 2 + 'px',
-                    'left': ($(window).width() - GlobalImageWidth) / 2 + 'px',
+                ILBState.img.css({
+                    'width': ILBState.imageWidth + 'px',
+                    'height': ILBState.imageHeight + 'px',
+                    'top': ($(window).height() - ILBState.imageHeight) / 2 + 'px',
+                    'left': ($(window).width() - ILBState.imageWidth) / 2 + 'px',
                 });
             };
         };
 
         var loadImage = function (direction) {
-            if (GlobalInProgress) {
+            if (ILBState.currentlyLoadingAnImage) {
                 return false;
             }
 
             direction = typeof direction === 'undefined' ? false: direction === 'left' ? 1: -1;
 
-            if (GlobalImg.length) {
+            if (ILBState.img.length) {
                 var params = {
                     'opacity': 0,
                 };
                 if (isCssTransitionSupport) {
-                    cssTransitionTranslateX(GlobalImg, (100 * direction) - GlobalSwipeDiff + 'px', options.animationSpeed / 1000);
+                    cssTransitionTranslateX(ILBState.img, (100 * direction) - ILBState.swipeDiff + 'px', options.animationSpeed / 1000);
                 } else {
-                    params.left = parseInt(GlobalImg.css('left')) + 100 * direction + 'px';
+                    params.left = parseInt(ILBState.img.css('left')) + 100 * direction + 'px';
                 }
-                GlobalImg.animate(params, options.animationSpeed, function () {
+                ILBState.img.animate(params, options.animationSpeed, function () {
                     removeImage();
                 });
-                GlobalSwipeDiff = 0;
+                ILBState.swipeDiff = 0;
             }
 
-            GlobalInProgress = true;
+            ILBState.currentlyLoadingAnImage = true;
             if (typeof options.onLoadStart === 'function') {
                 options.onLoadStart();
             }
 
             setTimeout(function () {
-                var imgPath = GlobalTarget.attr('href');
+                var imgPath = ILBState.target.attr('href');
                 if (imgPath === undefined) {
-                    imgPath = GlobalTarget.attr('data-lightbox');
+                    imgPath = ILBState.target.attr('data-lightbox');
                 }
-                GlobalImg = $('<img ' + options.selector + ' />')
+                ILBState.img = $('<img ' + options.selector + ' />')
                     .attr('src', imgPath)
                     .load(function () {
-                        GlobalImg.appendTo('body');
+                        ILBState.img.appendTo('body');
                         setImage();
 
                         var params = {
                             'opacity': 1,
                         };
 
-                        GlobalImg.css('opacity', 0);
+                        ILBState.img.css('opacity', 0);
                         if (isCssTransitionSupport) {
-                            cssTransitionTranslateX(GlobalImg, -100 * direction + 'px', 0);
+                            cssTransitionTranslateX(ILBState.img, -100 * direction + 'px', 0);
                             setTimeout(function () {
-                                cssTransitionTranslateX(GlobalImg, 0 + 'px', options.animationSpeed / 1000);
+                                cssTransitionTranslateX(ILBState.img, 0 + 'px', options.animationSpeed / 1000);
                             }, 50);
                         } else {
-                            var imagePosLeft = parseInt(GlobalImg.css('left'));
+                            var imagePosLeft = parseInt(ILBState.img.css('left'));
                             params.left = imagePosLeft + 'px';
-                            GlobalImg.css('left', imagePosLeft - 100 * direction + 'px');
+                            ILBState.img.css('left', imagePosLeft - 100 * direction + 'px');
                         }
 
-                        GlobalImg.animate(params, options.animationSpeed, function () {
-                            GlobalInProgress = false;
+                        ILBState.img.animate(params, options.animationSpeed, function () {
+                            ILBState.currentlyLoadingAnImage = false;
                             if (typeof options.onLoadEnd === 'function') {
                                 options.onLoadEnd();
                             }
                         });
                         if (options.preloadNext) {
-                            var nextTarget = GlobalTargetsArray.eq(GlobalTargetsArray.index(GlobalTarget) + 1);
+                            var nextTarget = ILBState.targetsArray.eq(ILBState.targetsArray.index(ILBState.target) + 1);
                             if (!nextTarget.length) {
-                                nextTarget = GlobalTargetsArray.eq(0);
+                                nextTarget = ILBState.targetsArray.eq(0);
                             }
                             $('<img />').attr('src', nextTarget.attr('href')).load();
                         }
@@ -217,7 +219,7 @@
                 var swipeEnd = 0;
                 var imagePosLeft = 0;
 
-                GlobalImg.on(CONST_HASPOINTERS ? 'pointerup MSPointerUp': 'click', function (e) {
+                ILBState.img.on(CONST_HASPOINTERS ? 'pointerup MSPointerUp': 'click', function (e) {
                     e.preventDefault();
                     if (options.quitOnImgClick) {
                         quitLightbox();
@@ -227,7 +229,7 @@
                         return true;
                     }
                     var posX = (e.pageX || e.originalEvent.pageX) - e.target.offsetLeft;
-                    if (GlobalImageWidth / 2 > posX) {
+                    if (ILBState.imageWidth / 2 > posX) {
                         loadPreviousImage();
                     } else {
                         loadNextImage();
@@ -238,7 +240,7 @@
                             return true;
                         }
                         if (isCssTransitionSupport) {
-                            imagePosLeft = parseInt(GlobalImg.css('left'));
+                            imagePosLeft = parseInt(ILBState.img.css('left'));
                         }
                         swipeStart = e.originalEvent.pageX || e.originalEvent.touches[0].pageX;
                     })
@@ -248,28 +250,28 @@
                         }
                         e.preventDefault();
                         swipeEnd = e.originalEvent.pageX || e.originalEvent.touches[0].pageX;
-                        GlobalSwipeDiff = swipeStart - swipeEnd;
+                        ILBState.swipeDiff = swipeStart - swipeEnd;
                         if (isCssTransitionSupport) {
-                            cssTransitionTranslateX(GlobalImg, -GlobalSwipeDiff + 'px', 0);
+                            cssTransitionTranslateX(ILBState.img, -ILBState.swipeDiff + 'px', 0);
                         } else {
-                            GlobalImg.css('left', imagePosLeft - GlobalSwipeDiff + 'px');
+                            ILBState.img.css('left', imagePosLeft - ILBState.swipeDiff + 'px');
                         }
                     })
                     .on('touchend touchcancel pointerup pointercancel MSPointerUp MSPointerCancel', function (e) {
                         if (!wasTouched(e.originalEvent) || options.quitOnImgClick) {
                             return true;
                         }
-                        if (Math.abs(GlobalSwipeDiff) > 50) {
-                            if (GlobalSwipeDiff < 0) {
+                        if (Math.abs(ILBState.swipeDiff) > 50) {
+                            if (ILBState.swipeDiff < 0) {
                                 loadPreviousImage();
                             } else {
                                 loadNextImage();
                             }
                         } else {
                             if (isCssTransitionSupport) {
-                                cssTransitionTranslateX(GlobalImg, 0 + 'px', options.animationSpeed / 1000);
+                                cssTransitionTranslateX(ILBState.img, 0 + 'px', options.animationSpeed / 1000);
                             } else {
-                                GlobalImg.animate({ 'left': imagePosLeft + 'px' }, options.animationSpeed / 2);
+                                ILBState.img.animate({ 'left': imagePosLeft + 'px' }, options.animationSpeed / 2);
                             }
                         }
                     });
@@ -290,20 +292,20 @@
         };
 
         var removeImage = function () {
-            if (!GlobalImg.length) {
+            if (!ILBState.img.length) {
                 return false;
             }
-            GlobalImg.remove();
-            GlobalImg = $();
+            ILBState.img.remove();
+            ILBState.img = $();
         };
 
         var quitLightbox = function () {
-            if (!GlobalImg.length) {
+            if (!ILBState.img.length) {
                 return false;
             }
-            GlobalImg.animate({ 'opacity': 0 }, options.animationSpeed, function () {
+            ILBState.img.animate({ 'opacity': 0 }, options.animationSpeed, function () {
                 removeImage();
-                GlobalInProgress = false;
+                ILBState.currentlyLoadingAnImage = false;
                 if (typeof options.onEnd === 'function') {
                     options.onEnd();
                 }
@@ -315,7 +317,7 @@
 
         if (options.quitOnDocClick) {
             $(document).on(CONST_HASTOUCH ? 'touchend': 'click', function (e) {
-                if (GlobalImg.length && !$(e.target).is(GlobalImg)) {
+                if (ILBState.img.length && !$(e.target).is(ILBState.img)) {
                     quitLightbox();
                 }
             });
@@ -323,7 +325,7 @@
 
         if (options.enableKeyboard) {
             $(document).on('keyup', function (e) {
-                if (!GlobalImg.length) {
+                if (!ILBState.img.length) {
                     return true;
                 }
                 e.preventDefault();
@@ -345,14 +347,14 @@
             if (e !== undefined) {
                 e.preventDefault();
             }
-            if (GlobalInProgress) {
+            if (ILBState.currentlyLoadingAnImage) {
                 return false;
             }
-            GlobalInProgress = false;
+
             if (typeof options.onStart === 'function') {
                 options.onStart();
             }
-            GlobalTarget = $(this);
+            ILBState.target = $(this);
             loadImage();
         };
 
@@ -363,14 +365,14 @@
             if (!isTargetValid(this)) {
                 return true;
             }
-            GlobalTargetsArray = GlobalTargetsArray.add($(this));
+            ILBState.targetsArray = ILBState.targetsArray.add($(this));
         });
 
         this.switchImageLightbox = function (index) {
-            var tmpTarget = GlobalTargetsArray.eq(index);
+            var tmpTarget = ILBState.targetsArray.eq(index);
             if (tmpTarget.length) {
-                var currentIndex = GlobalTargetsArray.index(GlobalTarget);
-                GlobalTarget = tmpTarget;
+                var currentIndex = ILBState.targetsArray.index(ILBState.target);
+                ILBState.target = tmpTarget;
                 loadImage(index < currentIndex ? 'left': 'right');
             }
             return this;
