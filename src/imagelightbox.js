@@ -71,7 +71,7 @@
             previousTarget: function () {
                 var targetIndex = GlobalTargetsArray.index(GlobalTarget) - 1;
                 if (targetIndex < 0) {
-                    if (options.quitOnEnd === true) {
+                    if (options.quitOnEnd) {
                         quitLightbox();
                         return false;
                     }
@@ -83,7 +83,7 @@
             nextTarget: function () {
                 var targetIndex = GlobalTargetsArray.index(GlobalTarget) + 1;
                 if (targetIndex >= GlobalTargetsArray.length) {
-                    if (options.quitOnEnd === true) {
+                    if (options.quitOnEnd) {
                         quitLightbox();
                         return false;
                     }
@@ -326,7 +326,7 @@
                     return true;
                 }
                 e.preventDefault();
-                if (e.keyCode === 27 && options.quitOnEscKey === true) {
+                if (e.keyCode === 27 && options.quitOnEscKey) {
                     quitLightbox();
                 }
                 if (e.keyCode === 37) {
