@@ -63,10 +63,11 @@
             quitOnImgClick: false,
             quitOnDocClick: true,
             quitOnEscKey: true, // quit when Esc key is pressed
-            onStart: false,
-            onEnd: false,
-            onLoadStart: false,
-            onLoadEnd: false,
+            // custom callbacks
+            onStart: undefined, // fired when lightbox opens
+            onLoadStart: undefined, // fired a new image starts to load (after onStart)
+            onLoadEnd: undefined, // fired after a new image has loaded
+            onEnd: undefined, // fired when lightbox closes
 
             previousTarget: function () {
                 var targetIndex = GlobalTargetsArray.index(GlobalTarget) - 1;
@@ -161,7 +162,7 @@
             }
 
             GlobalInProgress = true;
-            if (options.onLoadStart !== false) {
+            if (typeof options.onLoadStart === 'function') {
                 options.onLoadStart();
             }
 
@@ -194,7 +195,7 @@
 
                         GlobalImg.animate(params, options.animationSpeed, function () {
                             GlobalInProgress = false;
-                            if (options.onLoadEnd !== false) {
+                            if (typeof options.onLoadEnd === 'function') {
                                 options.onLoadEnd();
                             }
                         });
@@ -207,7 +208,7 @@
                         }
                     })
                     .error(function () {
-                        if (options.onLoadEnd !== false) {
+                        if (typeof options.onLoadEnd === 'function') {
                             options.onLoadEnd();
                         }
                     });
@@ -303,7 +304,7 @@
             GlobalImg.animate({ 'opacity': 0 }, options.animationSpeed, function () {
                 removeImage();
                 GlobalInProgress = false;
-                if (options.onEnd !== false) {
+                if (typeof options.onEnd === 'function') {
                     options.onEnd();
                 }
             });
@@ -348,7 +349,7 @@
                 return false;
             }
             GlobalInProgress = false;
-            if (options.onStart !== false) {
+            if (typeof options.onStart === 'function') {
                 options.onStart();
             }
             GlobalTarget = $(this);
