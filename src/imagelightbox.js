@@ -102,9 +102,11 @@
         var GlobalInProgress = false;
 
         var isTargetValid = function (element) {
-            var classic = $(element).prop('tagName').toLowerCase() === 'a' && (new RegExp('.(' + options.allowedTypes + ')$', 'i')).test($(element).attr('href'));
-            var html5 = $(element).attr('data-lightbox') !== undefined;
-            return classic || html5;
+            var allowedFileExtentionsRegex = new RegExp('.(' + options.allowedTypes + ')$', 'i');
+            var targetFileTypeIsSupported = allowedFileExtentionsRegex.test($(element).attr('href'));
+            var elementIsAnchorTag = $(element).prop('tagName').toLowerCase() === 'a';
+            var elementHasDataLightboxAttribute = $(element).attr('data-lightbox') !== undefined;
+            return (elementIsAnchorTag && targetFileTypeIsSupported) || elementHasDataLightboxAttribute;
         };
 
         var setImage = function () {
