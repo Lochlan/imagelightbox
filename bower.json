@@ -1,8 +1,8 @@
 {
   "name": "imagelightbox",
-  "version": "0.3.2",
+  "version": "0.0.0",
   "description": "Image Lightbox, Responsive and Touch‑friendly",
-  "repository": "https://github.com/rejas/imagelightbox.git",
+  "repository": "https://github.com/Lochlan/imagelightbox.git",
   "main": [
     "src/imagelightbox.js",
     "src/imagelightbox.css"
