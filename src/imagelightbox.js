@@ -58,7 +58,6 @@
 
         var options = $.extend({
             selector: 'id="imagelightbox"',
-            allowedTypes: 'png|jpg|jpeg|gif',
             animationSpeed: 250,
             preloadNext: true,
             enableKeyboard: true,
@@ -109,14 +108,6 @@
 
 
         // private methods
-
-        var isTargetValid = function (element) {
-            var allowedFileExtentionsRegex = new RegExp('.(' + options.allowedTypes + ')$', 'i');
-            var targetFileTypeIsSupported = allowedFileExtentionsRegex.test($(element).attr('href'));
-            var elementIsAnchorTag = $(element).prop('tagName').toLowerCase() === 'a';
-            var elementHasDataLightboxAttribute = $(element).attr('data-lightbox') !== undefined;
-            return (elementIsAnchorTag && targetFileTypeIsSupported) || elementHasDataLightboxAttribute;
-        };
 
         var setImage = function () {
             if (!ILBState.img.length) {
@@ -322,9 +313,6 @@
         // public methods
 
         this.startImageLightbox = function (e) {
-            if (!isTargetValid(this)) {
-                return true;
-            }
             if (e !== undefined) {
                 e.preventDefault();
             }
@@ -398,9 +386,6 @@
         }
 
         this.each(function () {
-            if (!isTargetValid(this)) {
-                return true;
-            }
             ILBState.targetsArray = ILBState.targetsArray.add($(this));
         });
 

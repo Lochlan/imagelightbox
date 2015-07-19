@@ -30,7 +30,6 @@ Options can be configured at initialization.  Options available and their defaul
 ````JavaScript
 $('a[data-imagelightbox="mygallery"]').imageLightbox({
     selector: 'id="imagelightbox"', // id of the lightbox itself
-    allowedTypes: 'png|jpg|jpeg|gif',
     animationSpeed: 250, // in milliseconds
     preloadNext: true, // silently preload the next image
     enableKeyboard: true, // enable keyboard shortcuts (arrows Left/Right and Esc)
