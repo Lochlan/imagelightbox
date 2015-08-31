@@ -94,10 +94,12 @@
 
 #imagelightbox-close:before {
     transform: rotate(45deg);
+    -webkit-transform: rotate(45deg);
 }
 
 #imagelightbox-close:after {
     transform: rotate(-45deg);
+    -webkit-transform: rotate(-45deg);
 }
 
 /* WITH CAPTION */
